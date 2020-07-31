@@ -1,6 +1,6 @@
 <template>
     <div class="vc-row">
-        <div v-for="weekDay in weekDays" :key="weekDay">{{weekDay}}</div>
+        <div class="vc-cell" v-for="weekDay in weekDays" v-bind:key="weekDay">{{weekDay}}</div>
     </div>
 </template>
 

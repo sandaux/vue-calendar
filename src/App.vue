@@ -1,17 +1,16 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <MonthHeader />
+    <Calendar />
   </div>
 </template>
 
 <script>
-import MonthHeader from './components/MonthHeader.vue'
+import Calendar from './components/Calendar.vue'
 
 export default {
   name: 'App',
   components: {
-    MonthHeader
+    Calendar
   }
 }
 </script>
