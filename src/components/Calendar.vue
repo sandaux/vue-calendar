@@ -1,5 +1,6 @@
 <template>
     <div class="vc-calendar">
+        <CalendarToolbar v-bind:currentMonth="currentMonth" v-on:current-month-change="handleCurrentMonthChange" />
         <MonthHeader />
         <WeekRow v-for="weekRowData in weekRowsData" v-bind:start="weekRowData.start" v-bind:events="weekRowData.events" v-bind:month="weekRowData.month" v-bind:key="weekRowData.start.valueOf()" />
     </div>
@@ -8,6 +9,7 @@
 <script>
 import MonthHeader from './MonthHeader.vue'
 import WeekRow from './WeekRow.vue'
+import CalendarToolbar from './CalendarToolbar.vue'
 import { addDays, addWeeks, startOfMonth, endOfMonth } from 'date-fns';
 
 const defaultColor = '#8ED1FC';
@@ -21,7 +23,7 @@ function calculateFirstCellDate(start) {
 export default {
     name: 'Calendar',
     components: {
-        MonthHeader, WeekRow
+        CalendarToolbar, MonthHeader, WeekRow
     },
     data() {
         return {
@@ -47,6 +49,11 @@ export default {
             }
 
             return weekRowsData;
+        }
+    },
+    methods: {
+        handleCurrentMonthChange(month) {
+            this.currentMonth = month;
         }
     }
 }
