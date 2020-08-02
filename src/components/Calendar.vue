@@ -2,7 +2,10 @@
     <div class="vc-calendar">
         <CalendarToolbar v-bind:currentMonth="currentMonth" v-on:current-month-change="handleCurrentMonthChange" />
         <MonthHeader />
-        <WeekRow v-for="weekRowData in weekRowsData" v-bind:start="weekRowData.start" v-bind:events="weekRowData.events" v-bind:month="weekRowData.month" v-bind:key="weekRowData.start.valueOf()" />
+        <WeekRow v-for="weekRowData in weekRowsData" v-bind:start="weekRowData.start" v-bind:events="weekRowData.events" v-bind:month="weekRowData.month" v-bind:key="weekRowData.start.valueOf()" v-on:date-cell-click="handleDateCellClick" v-on:event-bar-click="handleEventBarClick" />
+        <Modal v-if="eventToEdit" v-on:close-request="handleModalCloseRequest">
+            <EventDetails v-if="eventToEdit" v-bind:event="eventToEdit" v-on:event-change="handleEventToEditChange" v-on:event-save-request="handleEventToEditSaveRequest"></EventDetails>
+        </Modal>
     </div>
 </template>
 
@@ -10,7 +13,9 @@
 import MonthHeader from './MonthHeader.vue'
 import WeekRow from './WeekRow.vue'
 import CalendarToolbar from './CalendarToolbar.vue'
-import { addDays, addWeeks, startOfMonth, endOfMonth } from 'date-fns';
+import Modal from './Modal.vue'
+import EventDetails from './EventDetails.vue'
+import { addDays, addWeeks, startOfMonth, endOfMonth, endOfDay } from 'date-fns';
 
 const defaultColor = '#8ED1FC';
 
@@ -23,7 +28,7 @@ function calculateFirstCellDate(start) {
 export default {
     name: 'Calendar',
     components: {
-        CalendarToolbar, MonthHeader, WeekRow
+        CalendarToolbar, MonthHeader, WeekRow, Modal, EventDetails
     },
     data() {
         return {
@@ -32,7 +37,8 @@ export default {
                 { id: '1', title: 'do smth 1', start: addDays(new Date(), -20), end: addDays(new Date(), -10), color: defaultColor },
                 { id: '2', title: 'do smth 2', start: addDays(new Date(), -1), end: addDays(new Date(), 1), color: defaultColor },
                 { id: '3', title: 'do smth 3', start: addDays(new Date(), 1), end: addDays(new Date(), 19), color: defaultColor },
-            ]
+            ],
+            eventToEdit: undefined
         }
     },
     computed: {
@@ -54,6 +60,43 @@ export default {
     methods: {
         handleCurrentMonthChange(month) {
             this.currentMonth = month;
+        },
+        handleEventBarClick(event) {
+            this.eventToEdit = event;
+        },
+        handleDateCellClick(cellDate) {
+            this.eventToEdit = {
+                title: 'New event',
+                start: cellDate,
+                end: endOfDay(cellDate),
+                color: defaultColor
+            };
+
+            this.events.push({...this.eventToEdit});            
+        },
+        handleEventToEditChange(changedEvent) {
+            this.events = this.events.filter(event => event.id !== changedEvent.id).concat(changedEvent);
+        },
+        handleEventToEditSaveRequest(eventToSave) {
+            const calendarEvents = this.events.filter(event => event.id !== eventToSave.id).concat(eventToSave);
+
+            // todo: temp solution
+            if (!eventToSave.id) {
+                eventToSave.id = Math.random().toString(36).substring(7);
+            }
+
+            this.eventToEdit = undefined;
+            this.events = calendarEvents;
+        },
+        handleModalCloseRequest() {
+            const calendarEvents = this.events.filter(event => event.id !== this.eventToEdit.id);
+
+            if (this.eventToEdit?.id) {
+                calendarEvents.push(this.eventToEdit);
+            }
+
+            this.eventToEdit = undefined;
+            this.events = calendarEvents;
         }
     }
 }

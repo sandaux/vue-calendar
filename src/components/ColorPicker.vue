@@ -1,6 +1,6 @@
 <template>
     <div class="color-picker-items-container">
-        <div v-for="color in availableColors" class="color-picker-item" v-bind:style="{backgroundColor: color}" v-bind:key="color" v-on:clicl="onColorSelected(color)">
+        <div v-for="color in availableColors" class="color-picker-item" v-bind:style="{backgroundColor: color}" v-bind:key="color" v-on:click="onColorSelected(color)">
             <span className="color-picker-ok" v-bind:style="{ display: selectedColor === color ? 'inline' : 'none'}">&#10004;</span>
         </div>
     </div>
@@ -24,3 +24,22 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+.color-picker-item {
+    height: 26px;
+    width: 26px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 6px;
+    position: relative;    
+}
+
+.color-picker-items-container {
+    display: flex;
+}
+
+.color-picker-ok {
+    color: #fff;
+}
+</style>

@@ -1,5 +1,5 @@
 <template>
-    <div class="vc-event-bar" v-bind:class="{'rc-event-bar-temp': id}" v-on:click="onEventBarClick" v-bind:style="eventBarStyle">
+    <div class="vc-event-bar" v-bind:class="{'vc-event-bar-temp': !id}" v-on:click="onEventBarClick" v-bind:style="eventBarStyle">
         <span>{{title}}</span>
     </div>
 </template>
@@ -30,7 +30,7 @@ export default {
     },
     methods: {
         onEventBarClick() {
-            this.$emit('on-event-bar-click');
+            this.$emit('event-bar-click');
         }
     }
 }

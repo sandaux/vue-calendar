@@ -17,7 +17,7 @@
     </div>
     
     <div class="vc-row-content" v-for="(eventRow, index) in eventRows" v-bind:key="index">
-        <EventBar v-for="eventBar in eventRow.eventBars" v-bind:id="eventBar.event.id" v-bind:title="eventBar.event.title" v-bind:color="eventBar.event.color" v-bind:dayStart="eventBar.dayStart" v-bind:dayEnd="eventBar.dayEnd" v-on:click="onEventClick(eventBar.event)" v-bind:key="eventBar.event.id"></EventBar>
+        <EventBar v-for="eventBar in eventRow.eventBars" v-bind:id="eventBar.event.id" v-bind:title="eventBar.event.title" v-bind:color="eventBar.event.color" v-bind:dayStart="eventBar.dayStart" v-bind:dayEnd="eventBar.dayEnd" v-on:event-bar-click="onEventBarClick(eventBar.event)" v-bind:key="eventBar.event.id"></EventBar>
     </div>
   </div>
 </template>
@@ -80,24 +80,27 @@ export default {
     data() {    
         const weekDates = getWeekDates(this.start);
 
-        // todo: temp
-        const weekEvents = this.events.filter(e => e.start <= weekDates[6] && e.end >= this.start);
-
-        const eventBars = getEventBars(this.start, weekDates[6], weekEvents);
-        const eventRows = splitBetweenEventRows(eventBars);
-
         return {
             weekDates,
-            today: startOfDay(new Date()),
-            eventRows
+            today: startOfDay(new Date())
+        }
+    },
+    computed: {
+        eventRows() {
+            // todo: temp
+            const weekEnd = this.weekDates[6];
+            const weekEvents = this.events.filter(e => e.start <= weekEnd && e.end >= this.start);
+
+            const eventBars = getEventBars(this.start, weekEnd, weekEvents);
+            return splitBetweenEventRows(eventBars);
         }
     },
     methods: {
         onDateCellClick(weekDate) {
-            this.$emit('on-date-cell-click', weekDate);
+            this.$emit('date-cell-click', weekDate);
         },
-        onEventClick(event) {
-            this.$emit('on-event-click', event);
+        onEventBarClick(event) {
+            this.$emit('event-bar-click', event);
         }
     }
 }
