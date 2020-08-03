@@ -12,7 +12,9 @@
         <div class="form-group">
             <ColorPicker v-bind:selected-color="color" v-on:color-selected="onColorSelected" />
         </div>
-        <button class="btn" type="submit">Save</button>
+        <div class="form-group btn-panel">
+            <button class="btn" type="submit">Save</button>
+        </div>        
     </form>
 </template>
 

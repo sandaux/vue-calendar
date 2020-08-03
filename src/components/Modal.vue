@@ -1,15 +1,33 @@
 <template>
     <div class="modal">
         <div class="modal-content">
-            <span class="close-btn" v-on:click="onCloseRequest">&times;</span>
+            <div class="buttons-panel">
+                <span v-for="panelButton in panelButtons" v-bind:class="panelButton.class" v-bind:key="panelButton.name" v-on:click="panelButton.onClick" v-html="panelButton.unicodeChar"></span>
+            </div> 
             <slot></slot>
         </div>
     </div>
 </template>
 
 <script>
-export default {
+export default {    
     name: 'Modal',
+    props: {
+        actionButtons: Array
+    },
+    data() {
+        const closeButton = {
+            name: 'close',
+            class: 'action-btn action-btn-close',
+            onClick: this.onCloseRequest,
+            unicodeChar: '&times;',
+            showIf: () => true
+        };
+
+        return {
+            panelButtons: (this.actionButtons || []).concat(closeButton).filter(ab => ab.showIf()).reverse()
+        }
+    },
     methods: {
         onCloseRequest() {
             this.$emit('close-request');
@@ -26,12 +44,12 @@ export default {
     left: 0;
     top: 0;
     width: 100%;
-    height: 100%;    
+    height: 100%;
 }
 
 .modal-content {
     margin: auto;
-    padding: 30px 2px 8px;
+    padding: 2px 2px 8px;
     width: 30%;
     background-color: white;
     border-radius: 8px;
@@ -39,18 +57,22 @@ export default {
     position: relative;
 }
 
-/* The Close Button */
-.close-btn {
+.buttons-panel {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.action-btn {
     color: #aaa;
     font-size: 28px;
-    display: inline-block;
-    position: absolute;
-    top: -2px;
-    right: 2px;
 }
-  
-.close-btn:hover,
-.close-btn:focus {
+
+.action-btn-close {
+    font-size: 34px;
+}
+
+.action-btn:hover,
+.action-btn:focus {
     color: black;
     text-decoration: none;
     cursor: pointer;

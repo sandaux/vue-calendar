@@ -3,8 +3,8 @@
         <CalendarToolbar v-bind:currentMonth="currentMonth" v-on:current-month-change="handleCurrentMonthChange" />
         <MonthHeader />
         <WeekRow v-for="weekRowData in weekRowsData" v-bind:start="weekRowData.start" v-bind:events="weekRowData.events" v-bind:month="weekRowData.month" v-bind:key="weekRowData.start.valueOf()" v-on:date-cell-click="handleDateCellClick" v-on:event-bar-click="handleEventBarClick" />
-        <Modal v-if="eventToEdit" v-on:close-request="handleModalCloseRequest">
-            <EventDetails v-if="eventToEdit" v-bind:event="eventToEdit" v-on:event-change="handleEventToEditChange" v-on:event-save-request="handleEventToEditSaveRequest"></EventDetails>
+        <Modal v-if="eventToEdit" v-on:close-request="handleModalCloseRequest" v-bind:actionButtons="eventActionButtons">
+            <EventDetails v-if="eventToEdit" v-bind:event="eventToEdit" v-on:event-change="handleEventChange" v-on:event-save-request="handleEventSaveRequest"></EventDetails>
         </Modal>
     </div>
 </template>
@@ -15,7 +15,7 @@ import WeekRow from './WeekRow.vue'
 import CalendarToolbar from './CalendarToolbar.vue'
 import Modal from './Modal.vue'
 import EventDetails from './EventDetails.vue'
-import { addDays, addWeeks, startOfMonth, endOfMonth, endOfDay } from 'date-fns';
+import { addDays, addWeeks, startOfMonth, endOfMonth, startOfDay, endOfDay } from 'date-fns';
 
 const defaultColor = '#8ED1FC';
 
@@ -31,14 +31,25 @@ export default {
         CalendarToolbar, MonthHeader, WeekRow, Modal, EventDetails
     },
     data() {
+        const deleteEventBtn = {
+            name: 'delete',
+            class: 'action-btn',
+            onClick: this.handleEventDeleteRequest,
+            unicodeChar: '&#128465;',
+            showIf: () => this.eventToEdit?.id
+        };
+
         return {
             currentMonth: startOfMonth(new Date()),
             events: [
-                { id: '1', title: 'do smth 1', start: addDays(new Date(), -20), end: addDays(new Date(), -10), color: defaultColor },
-                { id: '2', title: 'do smth 2', start: addDays(new Date(), -1), end: addDays(new Date(), 1), color: defaultColor },
-                { id: '3', title: 'do smth 3', start: addDays(new Date(), 1), end: addDays(new Date(), 19), color: defaultColor },
+                { id: '1', title: 'Vue JS lernen', start: addDays(new Date(), -7), end: addDays(new Date(), -1), color: defaultColor },
+                { id: '2', title: 'Volleyball (Göggingen)', start: addDays(new Date(), -4), end: endOfDay(addDays(new Date(), -4)), color: '#7BDCB5' },
+                { id: '3', title: 'Fitness', start: addDays(new Date(), -2), end: endOfDay(addDays(new Date(), -2)), color: '#7BDCB5' },
+                { id: '4', title: 'Vorstellungsgespräch Kuka', start: startOfDay(new Date()), end: endOfDay(new Date()), color: '#FCB900' },
+                { id: '5', title: 'Urlaub', start: addDays(new Date(), 21), end: addDays(new Date(), 30), color: '#ABB8C3' },
             ],
-            eventToEdit: undefined
+            eventToEdit: undefined,
+            eventActionButtons: [deleteEventBtn]
         }
     },
     computed: {
@@ -74,10 +85,10 @@ export default {
 
             this.events.push({...this.eventToEdit});            
         },
-        handleEventToEditChange(changedEvent) {
+        handleEventChange(changedEvent) {
             this.events = this.events.filter(event => event.id !== changedEvent.id).concat(changedEvent);
         },
-        handleEventToEditSaveRequest(eventToSave) {
+        handleEventSaveRequest(eventToSave) {
             const calendarEvents = this.events.filter(event => event.id !== eventToSave.id).concat(eventToSave);
 
             // todo: temp solution
@@ -87,6 +98,11 @@ export default {
 
             this.eventToEdit = undefined;
             this.events = calendarEvents;
+        },
+        handleEventDeleteRequest() {
+            this.events = this.events.filter(event => event.id !== this.eventToEdit.id);
+            this.eventToEdit = undefined;            
+            
         },
         handleModalCloseRequest() {
             const calendarEvents = this.events.filter(event => event.id !== this.eventToEdit.id);
@@ -121,6 +137,10 @@ export default {
 .form-group {
     display: flex;
     padding: 4px;
+}
+
+.form-group.btn-panel{
+    flex-direction: row-reverse;
 }
 
 .form-input {
